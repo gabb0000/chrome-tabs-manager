@@ -12,6 +12,17 @@ function showToast(message) {
   }, 2000);
 }
 
+// Escape HTML to prevent XSS attacks
+function escapeHtml(unsafe) {
+  if (typeof unsafe !== 'string') return '';
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Format date for display
 function formatDate(timestamp) {
   const date = new Date(timestamp);
@@ -751,18 +762,18 @@ async function loadSessions() {
   }
 
   sessionsList.innerHTML = sessions.map((session, index) => `
-    <div class="session-item" data-session-id="${session.id}" data-session-index="${index}">
+    <div class="session-item" data-session-id="${escapeHtml(session.id)}" data-session-index="${index}">
       <div class="session-header">
-        <span class="session-name" data-session-id="${session.id}">${session.isWindow ? '🪟 ' : ''}${session.name}</span>
+        <span class="session-name" data-session-id="${escapeHtml(session.id)}">${session.isWindow ? '🪟 ' : ''}${escapeHtml(session.name)}</span>
         <div class="session-controls">
-          <button class="btn-icon rename-btn" data-session-id="${session.id}" data-session-name="${session.name}" title="Rinomina">
+          <button class="btn-icon rename-btn" data-session-id="${escapeHtml(session.id)}" data-session-name="${escapeHtml(session.name)}" title="Rinomina">
             <span class="icon">✏️</span>
           </button>
           <div class="move-buttons">
-            <button class="btn-icon move-up-btn" data-session-id="${session.id}" ${index === 0 ? 'disabled' : ''} title="Sposta su">
+            <button class="btn-icon move-up-btn" data-session-id="${escapeHtml(session.id)}" ${index === 0 ? 'disabled' : ''} title="Sposta su">
               <span class="icon">⬆️</span>
             </button>
-            <button class="btn-icon move-down-btn" data-session-id="${session.id}" ${index === sessions.length - 1 ? 'disabled' : ''} title="Sposta giù">
+            <button class="btn-icon move-down-btn" data-session-id="${escapeHtml(session.id)}" ${index === sessions.length - 1 ? 'disabled' : ''} title="Sposta giù">
               <span class="icon">⬇️</span>
             </button>
           </div>
@@ -773,15 +784,15 @@ async function loadSessions() {
         <span class="session-date">${formatDate(session.timestamp)}</span>
       </div>
       <div class="session-actions">
-        <button class="btn btn-primary restore-btn" data-session-id="${session.id}">
+        <button class="btn btn-primary restore-btn" data-session-id="${escapeHtml(session.id)}">
           <span class="icon">🔄</span>
           ${session.isWindow ? 'Ripristina Finestra' : 'Ripristina'}
         </button>
-        <button class="btn btn-secondary update-btn" data-session-id="${session.id}" data-session-name="${session.name}" data-is-window="${session.isWindow || false}">
+        <button class="btn btn-secondary update-btn" data-session-id="${escapeHtml(session.id)}" data-session-name="${escapeHtml(session.name)}" data-is-window="${session.isWindow || false}">
           <span class="icon">🔃</span>
           Aggiorna
         </button>
-        <button class="btn btn-danger delete-btn" data-session-id="${session.id}">
+        <button class="btn btn-danger delete-btn" data-session-id="${escapeHtml(session.id)}">
           <span class="icon">🗑️</span>
           Elimina
         </button>
@@ -848,16 +859,22 @@ async function openTabSelector() {
   const tabsList = document.getElementById('tabsList');
 
   // Populate tabs list
-  tabsList.innerHTML = tabs.map(tab => `
+  tabsList.innerHTML = tabs.map(tab => {
+    // Sanitize favicon URL - only allow http/https/data/chrome URLs
+    const safeFavicon = tab.favIconUrl && (tab.favIconUrl.startsWith('http://') || tab.favIconUrl.startsWith('https://') || tab.favIconUrl.startsWith('data:') || tab.favIconUrl.startsWith('chrome://'))
+      ? escapeHtml(tab.favIconUrl)
+      : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2220%22 font-size=%2220%22>📄</text></svg>';
+
+    return `
     <div class="tab-item" data-tab-id="${tab.id}">
       <input type="checkbox" class="tab-checkbox" data-tab-id="${tab.id}" checked>
-      <img class="tab-item-favicon" src="${tab.favIconUrl || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2220%22 font-size=%2220%22>📄</text></svg>'}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2220%22 font-size=%2220%22>📄</text></svg>'">
+      <img class="tab-item-favicon" src="${safeFavicon}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2220%22 font-size=%2220%22>📄</text></svg>'">
       <div class="tab-item-content">
-        <div class="tab-item-title">${tab.title || 'Untitled'}</div>
-        <div class="tab-item-url">${tab.url}</div>
+        <div class="tab-item-title">${escapeHtml(tab.title || 'Untitled')}</div>
+        <div class="tab-item-url">${escapeHtml(tab.url)}</div>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 
   // Add click handlers for tab items
   document.querySelectorAll('.tab-item').forEach(item => {
