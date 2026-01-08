@@ -1,0 +1,24 @@
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary Files
+*.tmp
+*.bak
+
+# Browser Extension Build/Package Files
+*.zip
+*.crx
+*.pem
+web-ext-artifacts/

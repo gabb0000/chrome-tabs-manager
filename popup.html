@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Session Manager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>📑 Tab Session Manager</h1>
+    </header>
+
+    <section class="save-section">
+      <h2>Salva Sessione</h2>
+      <div class="save-options">
+        <input type="text" id="sessionName" placeholder="Nome sessione (opzionale)" />
+        <div class="button-group">
+          <button id="saveCurrentTab" class="btn btn-primary">
+            <span class="icon">📄</span>
+            Salva Scheda Corrente
+          </button>
+          <button id="saveAllTabs" class="btn btn-primary">
+            <span class="icon">📚</span>
+            Salva Tutte le Schede
+          </button>
+          <button id="saveWindow" class="btn btn-primary">
+            <span class="icon">🪟</span>
+            Salva Finestra Corrente
+          </button>
+          <button id="saveTabGroup" class="btn btn-primary">
+            <span class="icon">📦</span>
+            Salva Gruppo Corrente
+          </button>
+          <button id="selectTabs" class="btn btn-primary">
+            <span class="icon">✅</span>
+            Seleziona Schede da Salvare
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sessions-section">
+      <h2>Sessioni Salvate</h2>
+      <div id="sessionsList" class="sessions-list">
+        <p class="empty-state">Nessuna sessione salvata</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal for tab selection -->
+  <div id="tabSelectorModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Seleziona Schede da Salvare</h2>
+        <button id="closeModal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="select-all-container">
+          <label>
+            <input type="checkbox" id="selectAllTabs" checked>
+            <span>Seleziona tutte</span>
+          </label>
+        </div>
+        <div id="tabsList" class="tabs-list">
+          <!-- Tabs will be populated here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <input type="text" id="modalSessionName" placeholder="Nome sessione (opzionale)" />
+        <div class="modal-actions">
+          <button id="cancelSelection" class="btn btn-secondary">Annulla</button>
+          <button id="saveSelectedTabs" class="btn btn-primary">
+            <span class="icon">💾</span>
+            Salva Selezionate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
